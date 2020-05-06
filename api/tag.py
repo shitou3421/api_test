@@ -9,7 +9,11 @@ class Tag(Work):
     def __init__(self):
         corpsecret = "i6hRZ7g5N9hA8BPYpa9H_8agPcHJKsxbtFOBm7KiqZA"
         self.params["access_token"] = self.get_token(corpsecret)
-        self.data = self.load_yaml("../api/tag.yaml")
+
+        locd = os.path.abspath(os.path.dirname(__file__))
+        case_path = os.path.join(locd, "tag.yaml")
+
+        self.data = self.load_yaml(case_path)
 
     def get(self):
         return self.send_api(self.data.get("get"))
