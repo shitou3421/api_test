@@ -1,0 +1,14 @@
+data:
+  - demo1
+  - demo2
+  - demo3
+
+steps:
+  - {method: tag.get}
+  - {path: "$..name", extract: before}
+  - {method: tag.add}
+  - {method: tag.get}
+  - {path: "$..name", extract: thing}
+  - {method: tag.delete}
+  - {method: tag.get}
+  - {path: "$..name[?(@.name=='{name}')]", extract: after}
