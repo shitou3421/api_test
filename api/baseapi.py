@@ -40,20 +40,35 @@ class BaseApi():
         r = requests.request(url=url, method=method, params=params, json=jsons)
         return format_data(r)
 
-    # def steps_run(self, steps):
-    #     '''接口的数据驱动，用例的数据驱动, 待完善'''
-    #     for step in steps:
-    #         raw = yaml.dump(step)
-    #         for k, v in self.params.items():
-    #             raw = raw.replace(f"{{{k}}}", repr(v))
-    #         step = yaml.load(raw)
-    #         if "method" in step.keys():
-    #             method = step["method"].split(".")[-1]
-    #             getattr(self, method)(**step)
-    #         if "extract" in step.keys():
-    #             self.data[step["extract"]] = self.json_path(**step)
-    #         if "assert" in step.keys():
-    #             assert eval(step["assert"])
+    def steps_run(self, steps: list):
+
+        for step in steps:
+            print(step)
+
+            # 模板内容替换
+            # todo: 使用format
+            raw = yaml.dump(step)
+            for key, value in self.params.items():
+                raw = raw.replace(f"${{{key}}}", repr(value))
+                print("replace")
+                print(raw)
+            step = yaml.safe_load(raw)
+
+            if isinstance(step, dict):
+                if "method" in step.keys():
+                    method=step['method'].split('.')[-1]
+                    getattr(self, method)(**step)
+                if "extract" in step.keys():
+                    self.data[step["extract"]]=getattr(self, 'jsonpath')(**step)
+                    print("extract")
+                    print(self.data[step["extract"]])
+
+                if "assertion" in step.keys():
+                    assertion=step["assertion"]
+                    if isinstance(assertion, str):
+                        assert eval(assertion)
+                    if assertion[1]=="eq":
+                        assert assertion[0] == assertion[2]
 
     def json_path(self, path, r):
         return jsonpath(path, r)
